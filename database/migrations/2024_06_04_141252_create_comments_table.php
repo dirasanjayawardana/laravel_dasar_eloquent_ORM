@@ -17,16 +17,17 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->string("id", 100)->nullable(false)->primary();
-            $table->string("name", 100)->nullable(false);
-            $table->text("description")->nullable();
-            $table->timestamp("created_at")->nullable(false)->useCurrent();
+        Schema::create('comments', function (Blueprint $table) {
+            $table->integer("id")->autoIncrement(); // ketika diset menjadi autoIncrement akan otomatis menjadi primaryKey
+            $table->string("email", 100)->nullable(false);
+            $table->string("title", 200)->nullable(false);
+            $table->text("comment")->nullable(true);
+            $table->timestamps(); // otomatis akan membuat tabel created_at dan upadated_at yang akan terisi otomatis dengan tipe timestamp
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('comments');
     }
 };

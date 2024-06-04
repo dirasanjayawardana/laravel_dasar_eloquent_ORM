@@ -17,16 +17,16 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->string("id", 100)->nullable(false)->primary();
+        Schema::create('vouchers', function (Blueprint $table) {
+            $table->uuid("id")->nullable(false)->primary();
             $table->string("name", 100)->nullable(false);
-            $table->text("description")->nullable();
+            $table->string("voucher_code", 200)->nullable(false);
             $table->timestamp("created_at")->nullable(false)->useCurrent();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('vouchers');
     }
 };
