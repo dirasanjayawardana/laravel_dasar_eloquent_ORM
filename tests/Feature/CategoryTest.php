@@ -244,6 +244,7 @@ class CategoryTest extends TestCase
         $category = Category::find("FOOD");
         self::assertNull($category);
 
+        // withoutGlobalScopes([NamaScope::class]) --> mematikan globalScope
         // mengambil semua data termasuk yang is_active nya false
         $category = Category::withoutGlobalScopes([IsActiveScope::class])->find("FOOD");
         self::assertNotNull($category);
