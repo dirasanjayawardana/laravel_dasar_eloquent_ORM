@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Scopes\IsActiveScope;
 use Database\Seeders\CategorySeeder;
 use Tests\TestCase;
 
@@ -173,4 +174,80 @@ class CategoryTest extends TestCase
         $total = Category::count();
         self::assertEquals(0, $total);
     }
+
+
+    // CREATE
+    // create(attributes) --> membuat model otomatis seusai dengan data arraynya, tidak perlu set key value satu satu
+    // secara default, semua atribute di Model tidak bisa di set langsung secara masal menggunakan method create()
+    // agar bisa di set langsung secara masal dengan create() maka attribute di model harus di daftarkan di $fillable
+    public function testCreate()
+    {
+        $request = [
+            "id" => "FOOD",
+            "name" => "Food",
+            "description" => "Food Category"
+        ];
+
+        $category = new Category($request);
+        $category->save();
+
+        self::assertNotNull($category->id);
+    }
+    // create() --> langsung menyimpan ke database tanpa harus menggunakan method save()
+    public function testCreateUsingQueryBuilder()
+    {
+        $request = [
+            "id" => "FOOD",
+            "name" => "Food",
+            "description" => "Food Category"
+        ];
+
+        // $category = Category::query()->create($request);
+        $category = Category::create($request);
+
+        self::assertNotNull($category->id);
+    }
+
+
+    // UPDATE --> fill() --> melakukan update object model secara sekaligus
+    public function testUpdateMass()
+    {
+        $this->seed(CategorySeeder::class);
+
+        $request = [
+            "name" => "Food Updated",
+            "description" => "Food Category Updated"
+        ];
+
+        $category = Category::find("FOOD");
+        $category->fill($request);
+        $category->save();
+
+        self::assertNotNull($category->id);
+    }
+
+
+    // Query Scope (cara menambahkan kondisi query secara otomatis, agar setiap melakukan query akan mengikuti kondisi yang telah ditentukan)
+    // Query Global Scope --> kondisi ditambahkan di model, secara otomatis ketika melakukan query, kondisi yang ditambahkan akan diterapkan di query builder, contoh ketika menggunakan trait SoftDelete otomatis menambahkan kondisi "where deleted_at = null"
+    // contoh menambahkan kondisi Active dan Non Active, dimana setiap melakukan query akan selalu mengambil data yg Active saja di kolom is_active
+    // php artisan make:scope NamaScope --> membuat scope di app/Models/Scopes, lalu tambahkan kondisi scope yg sudah dibuat, lalu tambahkan scope ke Model dengan mengoverride booted() dan menggunakan method addGlobalScope(scope)
+    public function testGlobalScope()
+    {
+        $category = new Category();
+        $category->id = "FOOD";
+        $category->name = "Food";
+        $category->description = "Food Category";
+        $category->is_active = false;
+        $category->save();
+
+        // data tidak ditemukan karena is_active nya false
+        $category = Category::find("FOOD");
+        self::assertNull($category);
+
+        // mengambil semua data termasuk yang is_active nya false
+        $category = Category::withoutGlobalScopes([IsActiveScope::class])->find("FOOD");
+        self::assertNotNull($category);
+
+    }
+
 }

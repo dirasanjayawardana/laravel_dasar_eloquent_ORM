@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Voucher extends Model
 {
@@ -13,8 +13,8 @@ class Voucher extends Model
     // $table, $primaryKey, $keyType, $incrementing, $timestamp dll
     // secara default eloquent terdapat kolom created_at dan updated_at, jika tidak butuh bisa mengoverride $timestamp menjadi false
 
-    // trait HasUuid (untuk menggunakan UUID pada model)
-    use HasUuids;
+    // trait HasUuid (untuk menggunakan UUID pada model), trait SoftDelete (tidak benar-benar menghapus data, hanya ditandai bahwa suatu data telah dihapus di kolom deleted_at, harus ada kolom deleted_at dengan tipe timestamp)
+    use HasUuids, SoftDeletes;
 
     protected $table = "vouchers";
     protected $primaryKey = "id";
