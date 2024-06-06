@@ -15,7 +15,7 @@ class WalletSeeder extends Seeder
     {
         $wallet = new Wallet();
         $wallet->amount = 1000000;
-        $wallet->customer_id = "EKO";
+        $wallet->customer_id = "DIRA";
         $wallet->save();
     }
 }

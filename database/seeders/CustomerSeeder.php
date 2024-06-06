@@ -14,9 +14,9 @@ class CustomerSeeder extends Seeder
     public function run(): void
     {
         $customer = new Customer();
-        $customer->id = "EKO";
-        $customer->name = "Eko";
-        $customer->email = "eko@pzn.com";
+        $customer->id = "DIRA";
+        $customer->name = "Dira";
+        $customer->email = "dira@email.com";
         $customer->save();
     }
 }

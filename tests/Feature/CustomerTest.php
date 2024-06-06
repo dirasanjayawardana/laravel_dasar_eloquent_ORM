@@ -15,7 +15,7 @@ class CustomerTest extends TestCase
     {
         $this->seed([CustomerSeeder::class, WalletSeeder::class]);
 
-        $customer = Customer::find("EKO");
+        $customer = Customer::find("DIRA");
         self::assertNotNull($customer);
 
         // $wallet = Wallet::where("customer_id", $customer->id)->first();

@@ -14,7 +14,7 @@ class CommentTest extends TestCase
     public function testCreateComment()
     {
         $comment = new Comment();
-        $comment->email = "eko@pzn.com";
+        $comment->email = "dira@email.com";
         $comment->title = "Sample Title";
         $comment->comment = "Sample Comment";
         $comment->save();
@@ -26,7 +26,7 @@ class CommentTest extends TestCase
     public function testDefaultAttributeValues()
     {
         $comment = new Comment();
-        $comment->email = "eko@pzn.com";
+        $comment->email = "dira@email.com";
 
         $comment->save();
 
