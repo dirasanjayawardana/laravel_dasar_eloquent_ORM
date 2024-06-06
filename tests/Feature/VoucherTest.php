@@ -56,4 +56,24 @@ class VoucherTest extends TestCase
         $voucher = Voucher::withTrashed()->where('name', '=', 'Sample Voucher')->first();
         self::assertNotNull($voucher);
     }
+
+
+    // Query Scope (cara menambahkan kondisi query secara otomatis, agar setiap melakukan query akan mengikuti kondisi yang telah ditentukan)
+    // Query Local Scope (secara default tidak aktif, kecuali mengaktifkannya ketika melakukan query)
+    // untuk membuat query local scope dengan membuat method di Model dengan awalan scope lalu diikuti dengan nama scopenya, contoh scopeActive(), scopeNonActive(), yang mana method tersebut membutuhkan parameter Builder untuk menambahkan kondisi
+    // untuk menggunakan local scope, dengan memanggil methodnya (namaScope()), diawali dengan lowecase tanpa prefix "scope"
+    public function testLocalScope()
+    {
+        $voucher = new Voucher();
+        $voucher->name = "Sample Voucher";
+        $voucher->is_active = true;
+        $voucher->save();
+
+        $total = Voucher::active()->count();
+        self::assertEquals(1, $total);
+
+        $total = Voucher::nonActive()->count();
+        self::assertEquals(0, $total);
+    }
+
 }

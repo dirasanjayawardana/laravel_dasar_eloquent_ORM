@@ -250,5 +250,4 @@ class CategoryTest extends TestCase
         self::assertNotNull($category);
 
     }
-
 }
