@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Relations\OneToMany\Product;
 use App\Models\Scopes\IsActiveScope;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\ProductSeeder;
 use Tests\TestCase;
 
 // override setUp method di TestCase
@@ -248,6 +250,57 @@ class CategoryTest extends TestCase
         // mengambil semua data termasuk yang is_active nya false
         $category = Category::withoutGlobalScopes([IsActiveScope::class])->find("FOOD");
         self::assertNotNull($category);
+    }
 
+
+    // untuk relasi one to many bisa menggunakan method hasMany() pada model, untuk relasi bidirectional (dua arah) menggunakan method belongsTo() pada model yg lain
+    public function testOneToMany()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $category = Category::find("FOOD");
+        self::assertNotNull($category);
+
+        // $products = Product::where("category_id", $category->id)->get();
+        $products = $category->products;
+
+        self::assertNotNull($products);
+        self::assertCount(2, $products);
+    }
+
+
+    // ketika suatu model memiliki relasi ke model lain, maka bisa melakukan CRUD model lain dengan menggunakan method relationship
+    public function testOneToManyQuery()
+    {
+        $category = new Category();
+        $category->id = "FOOD";
+        $category->name = "Food";
+        $category->description = "Food Category";
+        $category->is_active = true;
+        $category->save();
+
+        $product = new Product();
+        $product->id = "1";
+        $product->name = "Product 1";
+        $product->description = "Description 1";
+
+        $category->products()->save($product);
+
+        self::assertNotNull($product->category_id);
+    }
+
+
+    // ketika suatu model memiliki relasi ke model lain, maka bisa melakukan CRUD model lain dengan menggunakan method relationship
+    public function testRelationshipQuery()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $category = Category::find("FOOD");
+        $products = $category->products;
+        self::assertCount(2, $products);
+
+        // select * from `products` where `products`.`category_id` = ? and `products`.`category_id` is not null and `stock` <= ? 
+        $outOfStockProducts = $category->products()->where('stock', '<=', 0)->get();
+        self::assertCount(2, $outOfStockProducts);
     }
 }

@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Relations\OneToMany\Product;
 use App\Models\Scopes\IsActiveScope;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Category extends Model
 {
@@ -28,6 +30,13 @@ class Category extends Model
     ];
 
 
+    // untuk relasi one to many bisa menggunakan method hasMany() pada model, untuk relasi bidirectional (dua arah) menggunakan method belongsTo() pada model yg lain
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class, "category_id", "id");
+    }
+
+
     // Query Scope (cara menambahkan kondisi query secara otomatis, agar setiap melakukan query akan mengikuti kondisi yang telah ditentukan)
     // Query Global Scope --> kondisi ditambahkan di model, secara otomatis ketika melakukan query, kondisi yang ditambahkan akan diterapkan di query builder, contoh ketika menggunakan trait SoftDelete otomatis menambahkan kondisi "where deleted_at = null"
     // contoh menambahkan kondisi Active dan Non Active, dimana setiap melakukan query akan selalu mengambil data yg Active saja di kolom is_active
@@ -36,5 +45,18 @@ class Category extends Model
     {
         parent::booted();
         self::addGlobalScope(new IsActiveScope());
+    }
+
+
+    // HasOneOfMany (mengambil satu data saja dari relasi one to many)
+    // sebenarnya bisa menggunakan query builder, $model1->model2()->where("kondisi")-->get()
+    // namun untuk mempermudah bisa dengan menambahkan method di model yang mengembalikan HasOne
+    public function cheapestProduct(): HasOne
+    {
+        return $this->hasOne(Product::class, "category_id", "id")->oldest("price");
+    }
+    public function mostExpensiveProduct(): HasOne
+    {
+        return $this->hasOne(Product::class, "category_id", "id")->latest("price");
     }
 }

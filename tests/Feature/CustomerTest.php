@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Relations\OneToOne\Customer;
+use App\Models\Relations\OneToOne\Wallet;
 use Database\Seeders\CustomerSeeder;
 use Database\Seeders\WalletSeeder;
 use Tests\TestCase;
@@ -23,5 +24,24 @@ class CustomerTest extends TestCase
         self::assertNotNull($wallet);
 
         self::assertEquals(1000000, $wallet->amount);
+    }
+
+
+    // ketika suatu model memiliki relasi ke model lain, maka bisa melakukan CRUD model lain dengan menggunakan method relationship
+    public function testOneToOneQuery()
+    {
+        $customer = new Customer();
+        $customer->id = "DIRA";
+        $customer->name = "Dira";
+        $customer->email = "dira@email.com";
+        $customer->save();
+
+        $wallet = new Wallet();
+        $wallet->amount = 1000000;
+
+        // melakukan query ke model wallet dengan model customer
+        $customer->wallet()->save($wallet);
+
+        self::assertNotNull($wallet->customer_id);
     }
 }
