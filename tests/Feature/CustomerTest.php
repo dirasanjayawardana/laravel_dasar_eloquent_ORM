@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Relations\OneToOne\Customer;
 use App\Models\Relations\OneToOne\Wallet;
+use Database\Seeders\CategorySeeder;
 use Database\Seeders\CustomerSeeder;
+use Database\Seeders\ProductSeeder;
 use Database\Seeders\VirtualAccountSeeder;
 use Database\Seeders\WalletSeeder;
 use Tests\TestCase;
@@ -59,5 +61,71 @@ class CustomerTest extends TestCase
         $virtualAccount = $customer->virtualAccount;
         self::assertNotNull($virtualAccount);
         self::assertEquals("BCA", $virtualAccount->bank);
+    }
+
+
+    // relasi ManyToMany harus membuat tabel jembatan sebagai tabel penengahnya (intermediate Table)
+    // untuk membuat relasi manyToMany bisa menggunakan belongsToMany di kedua modelnya
+    // contoh relasi manyToMany antara model Customer dan Product, tabel customers_likes_product sebagai jembatannya
+    public function testManyToMany()
+    {
+        $this->seed([CustomerSeeder::class, CategorySeeder::class, ProductSeeder::class]);
+
+        $customer = Customer::find("DIRA");
+        self::assertNotNull($customer);
+
+        // attach(id) --> untuk menambah relasi, akan melakukan insert data ke customers_likes_products
+        $customer->likeProducts()->attach("1");
+
+        $products = $customer->likeProducts;
+        self::assertCount(1, $products);
+
+        self::assertEquals("1", $products[0]->id);
+    }
+    // untuk menghapus relasi oneToOne dan oneToMany cukup mudah dengan menhapus kolom foreign key nya
+    // unutk menghpuas relasi many to many bisa menggunakan method detach() pada BelongsToMany
+    public function testManyToManyDetach()
+    {
+        $this->testManyToMany();
+
+        // detach(id) --> akan menghapus relasi, akan hapus data di customers_likes_products
+        $customer = Customer::find("DIRA");
+        $customer->likeProducts()->detach("1");
+
+        $products = $customer->likeProducts;
+        self::assertCount(0, $products);
+    }
+    // pivot(); untuk mengambil semua isi kolom di intermediate table, secare default hanya foreign key model 1 dan 2 saja yang akan diquery di Pivot Attribute, jika ingin menambhakan kolom lain, bisa tambahkan pada relasi BelongsToMany dengan method withPivot()
+    public function testPivotAttribute()
+    {
+        $this->testManyToMany();
+
+        $customer = Customer::find("DIRA");
+        $products = $customer->likeProducts;
+
+        foreach ($products as $product) {
+            $pivot = $product->pivot;
+            self::assertNotNull($pivot);
+            self::assertNotNull($pivot->customer_id);
+            self::assertNotNull($pivot->product_id);
+            self::assertNotNull($pivot->created_at);
+        }
+    }
+    // wherePivot(namaKolom); untuk mengambil semua isi kolom intermediate table berdasarkan filter kondisi tertentu
+    // contoh mengambil products yang di like customer A pada waktu 7 hari terakhir
+    public function testPivotAttributeCondition()
+    {
+        $this->testManyToMany();
+
+        $customer = Customer::find("DIRA");
+        $products = $customer->likeProductsLastWeek;
+
+        foreach ($products as $product) {
+            $pivot = $product->pivot;
+            self::assertNotNull($pivot);
+            self::assertNotNull($pivot->customer_id);
+            self::assertNotNull($pivot->product_id);
+            self::assertNotNull($pivot->created_at);
+        }
     }
 }

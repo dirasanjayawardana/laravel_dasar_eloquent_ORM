@@ -4,11 +4,14 @@ namespace App\Models\Relations\OneToOne;
 
 use App\Models\Relations\ManyThrough\Review;
 use App\Models\Relations\OneThrough\VirtualAccount;
+use App\Models\Relations\OneToMany\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Support\Facades\Date;
 
 class Customer extends Model
 {
@@ -46,5 +49,24 @@ class Customer extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class, "customer_id", "id");
+    }
+
+
+    // relasi ManyToMany harus membuat tabel jembatan sebagai tabel penengahnya (intermediate Table)
+    // untuk membuat relasi manyToMany bisa menggunakan belongsToMany di kedua modelnya
+    // contoh relasi manyToMany antara model Customer dan Product, tabel customers_likes_product sebagai jembatannya
+    // pivot(); untuk mengambil semua isi kolom di intermediate table, secare default hanya foreign key model 1 dan 2 saja yang akan diquery di Pivot Attribute, jika ingin menambhakan kolom lain, bisa tambahkan pada relasi BelongsToMany dengan method withPivot(namaKolom)
+    public function likeProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, "customers_likes_products", "customer_id", "product_id")
+            ->withPivot("created_at");
+    }
+    // wherePivot(namaKolom); untuk mengambil semua isi kolom intermediate table berdasarkan filter kondisi tertentu
+    // contoh mengambil products yang di like customer A pada waktu 7 hari terakhir
+    public function likeProductsLastWeek(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, "customers_likes_products", "customer_id", "product_id")
+            ->withPivot("created_at")
+            ->wherePivot("created_at", ">=", Date::now()->addDays(-7));
     }
 }
