@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Relations\ManyThrough\Review;
 use App\Models\Relations\OneToMany\Product;
 use App\Models\Scopes\IsActiveScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Category extends Model
@@ -58,5 +60,20 @@ class Category extends Model
     public function mostExpensiveProduct(): HasOne
     {
         return $this->hasOne(Product::class, "category_id", "id")->latest("price");
+    }
+
+
+    // relasi HasManyThrough (relasi antar model yang tidak berhubungan langsung, tetapi melewati model lain)
+    // contoh relasi model Category oneToMany ke Proudct, model Product oneToMany ke Review, maka bisa membuat relasi antara Category dengan Review yang melewati model Product
+    public function reviews(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Review::class,
+            Product::class,
+            "category_id", // foreign key di products
+            "product_id", // foreign key di reviews
+            "id", // primary key di categories
+            "id" // primary key di products
+        );
     }
 }

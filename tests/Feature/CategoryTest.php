@@ -6,7 +6,9 @@ use App\Models\Category;
 use App\Models\Relations\OneToMany\Product;
 use App\Models\Scopes\IsActiveScope;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\CustomerSeeder;
 use Database\Seeders\ProductSeeder;
+use Database\Seeders\ReviewSeeder;
 use Tests\TestCase;
 
 // override setUp method di TestCase
@@ -299,8 +301,23 @@ class CategoryTest extends TestCase
         $products = $category->products;
         self::assertCount(2, $products);
 
-        // select * from `products` where `products`.`category_id` = ? and `products`.`category_id` is not null and `stock` <= ? 
+        // select * from `products` where `products`.`category_id` = ? and `products`.`category_id` is not null and `stock` <= ?
         $outOfStockProducts = $category->products()->where('stock', '<=', 0)->get();
         self::assertCount(2, $outOfStockProducts);
+    }
+
+
+    // relasi HasManyThrough (relasi antar model yang tidak berhubungan langsung, tetapi melewati model lain)
+    // contoh relasi model Category oneToMany ke Proudct, model Product oneToMany ke Review, maka bisa membuat relasi antara Category dengan Review yang melewati model Product
+    public function testHasManyThrough()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class, CustomerSeeder::class, ReviewSeeder::class]);
+
+        $category = Category::find("FOOD");
+        self::assertNotNull($category);
+
+        $reviews = $category->reviews;
+        self::assertNotNull($reviews);
+        self::assertCount(2, $reviews);
     }
 }

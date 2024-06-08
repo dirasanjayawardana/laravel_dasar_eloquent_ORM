@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Relations\OneToOne\Customer;
 use App\Models\Relations\OneToOne\Wallet;
 use Database\Seeders\CustomerSeeder;
+use Database\Seeders\VirtualAccountSeeder;
 use Database\Seeders\WalletSeeder;
 use Tests\TestCase;
 
@@ -43,5 +44,20 @@ class CustomerTest extends TestCase
         $customer->wallet()->save($wallet);
 
         self::assertNotNull($wallet->customer_id);
+    }
+
+
+    // relasi HasOneThrough (relasi antar model yang tidak berhubungan langsung, tetapi melewati model lain)
+    // contoh relasi model Customer oneToOne ke Wallet, model Wallet oneToOne VirtualAccount, maka bisa membuat relasi antara Customer dengan VirtualAccount yang melewati model Wallet
+    public function testHasOneThrough()
+    {
+        $this->seed([CustomerSeeder::class, WalletSeeder::class, VirtualAccountSeeder::class]);
+
+        $customer = Customer::find("DIRA");
+        self::assertNotNull($customer);
+
+        $virtualAccount = $customer->virtualAccount;
+        self::assertNotNull($virtualAccount);
+        self::assertEquals("BCA", $virtualAccount->bank);
     }
 }
