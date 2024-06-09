@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Relations\Polymorphic\Tag;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Voucher extends Model
@@ -43,5 +46,21 @@ class Voucher extends Model
     public function scopeNonActive(Builder $builder): void
     {
         $builder->where('is_active', "=", false);
+    }
+
+
+    // OneToMany Polymorphic mirip seperti relasi OneToMany, bedanya pada tabel tidak menambahkan Unique Constraint, karena bisa lebih dari satu
+    // contoh relasi OneToMany Polymorphic pada Comment dengan Product dan Voucher, artinya bisa menambahkan lebih dari satu Comment ke Product dan Voucher
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, "commentable");
+    }
+
+
+    // ManyToMany Polymorphic mirip seperti relasi ManyToMany, namun relasinya bisa beberapa model
+    // contoh relasi ManyToMany Polymorphic pada Tag dengan Product dan Voucher, artinya bisa satu Tag bisa digunakan dibanyak Voucher dan Product, satu Voucher dan Product bisa punya banyak Tag
+    public function tags(): MorphToMany
+    {
+        return $this->morphToMany(Tag::class, "taggable");
     }
 }

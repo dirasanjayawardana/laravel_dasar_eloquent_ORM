@@ -3,15 +3,19 @@
 namespace App\Models\Relations\OneToMany;
 
 use App\Models\Category;
+use App\Models\Comment;
 use App\Models\Relations\ManyThrough\Review;
 use App\Models\Relations\ManyToMany\Like;
 use App\Models\Relations\OneToOne\Customer;
 use App\Models\Relations\Polymorphic\Image;
+use App\Models\Relations\Polymorphic\Tag;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Product extends Model
 {
@@ -49,12 +53,43 @@ class Product extends Model
     }
 
 
-    // Polymorphic Relationships (relasi antar tabel namun relasinya bisa berbeda model)
+    // Polymorphic Relationships (relasi antar tabel namun relasinya bisa beberapa model)
     // namun relasi ini tidak dianjurkan karena dalam relation database, satu kolom foreign key hanya bisa mnegacu ke satu tabel
     // OneToOne Polymorphic mirip seperti relasi OneToOne, hanya saja relasinya bisa lebih dari satu model
     // contoh Customer dan Product punya satu Image, artinya Model Image berelasi OneToOne dengan Customer dan Product
     public function image(): MorphOne
     {
         return $this->morphOne(Image::class, "imageable");
+    }
+
+
+    // OneToMany Polymorphic mirip seperti relasi OneToMany, bedanya pada tabel tidak menambahkan Unique Constraint, karena bisa lebih dari satu
+    // contoh relasi OneToMany Polymorphic pada Comment dengan Product dan Voucher, artinya bisa menambahkan lebih dari satu Comment ke Product dan Voucher
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, "commentable");
+    }
+
+
+    // HasOneOfMany (mengambil satu data saja dari relasi one to many)
+    // sebenarnya bisa menggunakan query builder, $model1->model2()->where("kondisi")-->get()
+    // untuk di polymorphic bisa menggunakan MorphOne
+    public function latestComment(): MorphOne
+    {
+        return $this->morphOne(Comment::class, "commentable")
+            ->latest("created_at");
+    }
+    public function oldestComment(): MorphOne
+    {
+        return $this->morphOne(Comment::class, "commentable")
+            ->oldest("created_at");
+    }
+
+
+    // ManyToMany Polymorphic mirip seperti relasi ManyToMany, namun relasinya bisa beberapa model
+    // contoh relasi ManyToMany Polymorphic pada Tag dengan Product dan Voucher, artinya bisa satu Tag bisa digunakan dibanyak Voucher dan Product, satu Voucher dan Product bisa punya banyak Tag
+    public function tags(): MorphToMany
+    {
+        return $this->morphToMany(Tag::class, "taggable");
     }
 }
