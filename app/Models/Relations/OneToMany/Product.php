@@ -4,11 +4,14 @@ namespace App\Models\Relations\OneToMany;
 
 use App\Models\Category;
 use App\Models\Relations\ManyThrough\Review;
+use App\Models\Relations\ManyToMany\Like;
 use App\Models\Relations\OneToOne\Customer;
+use App\Models\Relations\Polymorphic\Image;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Product extends Model
 {
@@ -41,6 +44,17 @@ class Product extends Model
     public function likedByCustomers(): BelongsToMany
     {
         return $this->belongsToMany(Customer::class, "customers_likes_products", "product_id", "customer_id")
-            ->withPivot("created_at");
+            ->withPivot("created_at")
+            ->using(Like::class);
+    }
+
+
+    // Polymorphic Relationships (relasi antar tabel namun relasinya bisa berbeda model)
+    // namun relasi ini tidak dianjurkan karena dalam relation database, satu kolom foreign key hanya bisa mnegacu ke satu tabel
+    // OneToOne Polymorphic mirip seperti relasi OneToOne, hanya saja relasinya bisa lebih dari satu model
+    // contoh Customer dan Product punya satu Image, artinya Model Image berelasi OneToOne dengan Customer dan Product
+    public function image(): MorphOne
+    {
+        return $this->morphOne(Image::class, "imageable");
     }
 }

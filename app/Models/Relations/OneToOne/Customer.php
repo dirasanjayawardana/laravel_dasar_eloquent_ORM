@@ -3,14 +3,17 @@
 namespace App\Models\Relations\OneToOne;
 
 use App\Models\Relations\ManyThrough\Review;
+use App\Models\Relations\ManyToMany\Like;
 use App\Models\Relations\OneThrough\VirtualAccount;
 use App\Models\Relations\OneToMany\Product;
+use App\Models\Relations\Polymorphic\Image;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\Date;
 
 class Customer extends Model
@@ -56,10 +59,12 @@ class Customer extends Model
     // untuk membuat relasi manyToMany bisa menggunakan belongsToMany di kedua modelnya
     // contoh relasi manyToMany antara model Customer dan Product, tabel customers_likes_product sebagai jembatannya
     // pivot(); untuk mengambil semua isi kolom di intermediate table, secare default hanya foreign key model 1 dan 2 saja yang akan diquery di Pivot Attribute, jika ingin menambhakan kolom lain, bisa tambahkan pada relasi BelongsToMany dengan method withPivot(namaKolom)
+    // using(Like::class); menggunakan pivot model Like sebagai model penengahnya
     public function likeProducts(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, "customers_likes_products", "customer_id", "product_id")
-            ->withPivot("created_at");
+            ->withPivot("created_at")
+            ->using(Like::class);
     }
     // wherePivot(namaKolom); untuk mengambil semua isi kolom intermediate table berdasarkan filter kondisi tertentu
     // contoh mengambil products yang di like customer A pada waktu 7 hari terakhir
@@ -67,6 +72,17 @@ class Customer extends Model
     {
         return $this->belongsToMany(Product::class, "customers_likes_products", "customer_id", "product_id")
             ->withPivot("created_at")
-            ->wherePivot("created_at", ">=", Date::now()->addDays(-7));
+            ->wherePivot("created_at", ">=", Date::now()->addDays(-7))
+            ->using(Like::class);
+    }
+
+
+    // Polymorphic Relationships (relasi antar tabel namun relasinya bisa berbeda model)
+    // namun relasi ini tidak dianjurkan karena dalam relation database, satu kolom foreign key hanya bisa mnegacu ke satu tabel
+    // OneToOne Polymorphic mirip seperti relasi OneToOne, hanya saja relasinya bisa lebih dari satu model
+    // contoh Customer dan Product punya satu Image, artinya Model Image berelasi OneToOne dengan Customer dan Product
+    public function image(): MorphOne
+    {
+        return $this->morphOne(Image::class, "imageable");
     }
 }

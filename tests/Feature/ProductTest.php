@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Relations\OneToMany\Product;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\CustomerSeeder;
+use Database\Seeders\ImageSeeder;
 use Database\Seeders\ProductSeeder;
 use Tests\TestCase;
 
@@ -44,5 +46,23 @@ class ProductTest extends TestCase
         $mostExpensiveProduct = $category->mostExpensiveProduct;
         self::assertNotNull($mostExpensiveProduct);
         self::assertEquals("2", $mostExpensiveProduct->id);
+    }
+
+
+    // Polymorphic Relationships (relasi antar tabel namun relasinya bisa berbeda model)
+    // namun relasi ini tidak dianjurkan karena dalam relation database, satu kolom foreign key hanya bisa mnegacu ke satu tabel
+    // OneToOne Polymorphic mirip seperti relasi OneToOne, hanya saja relasinya bisa lebih dari satu model
+    // contoh Customer dan Product punya satu Image, artinya Model Image berelasi OneToOne dengan Customer dan Product
+    public function testOneToOnePolymorphic()
+    {
+        $this->seed([CustomerSeeder::class, CategorySeeder::class, ProductSeeder::class, ImageSeeder::class]);
+
+        $customer = Product::find("DIRA");
+        self::assertNotNull($customer);
+
+        $image = $customer->image;
+        self::assertNotNull($image);
+
+        self::assertEquals("https://www.dirapp.com/image/2.jpg", $image->url);
     }
 }
