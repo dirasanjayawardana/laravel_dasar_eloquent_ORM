@@ -139,7 +139,7 @@ class CustomerTest extends TestCase
         $customer = Customer::find("DIRA");
         $products = $customer->likeProducts;
 
-        foreach ($products as $product){
+        foreach ($products as $product) {
             $pivot = $product->pivot; // object Model Like
             self::assertNotNull($pivot);
             self::assertNotNull($pivot->customer_id);
@@ -168,5 +168,26 @@ class CustomerTest extends TestCase
         self::assertNotNull($image);
 
         self::assertEquals("https://www.dirapp.com/image/1.jpg", $image->url);
+    }
+
+
+    // Lazy Loading
+    // secara default semua relasi akan diload(ambil) datanya ketika attributenya dipanggil, baru laravel akan melakukan query
+    // Eager Loading
+    // langsung mengambil data secara langsung ketika kita mengambil data Model
+    // bisa menggunakan Query Builder dengan method with([methodRelation]) atau bisa hardcode di Modelnya dengan override $with
+    public function testEager()
+    {
+        $this->seed([CustomerSeeder::class, WalletSeeder::class, ImageSeeder::class]);
+
+        $customer = Customer::with(["wallet", "image"])->find("DIRA");
+        self::assertNotNull($customer);
+    }
+    public function testEagerModel()
+    {
+        $this->seed([CustomerSeeder::class, WalletSeeder::class, ImageSeeder::class]);
+
+        $customer = Customer::find("DIRA");
+        self::assertNotNull($customer);
     }
 }

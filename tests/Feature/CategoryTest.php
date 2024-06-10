@@ -320,4 +320,37 @@ class CategoryTest extends TestCase
         self::assertNotNull($reviews);
         self::assertCount(2, $reviews);
     }
+
+
+    // Querying Relations
+    // menggunakan Query seoerti di Query Builder pada method realtionship di Model
+    public function testQueryingRelations()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $category = Category::find("FOOD");
+        $products = $category->products()->where("price", "=", 200)->get();
+
+        self::assertCount(1, $products);
+        self::assertEquals("2", $products[0]->id);
+
+    }
+
+
+    // Agregating Relations
+    // menggunakan agregate query pada method relationship di Model
+    public function testAggregatingRelations()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $category = Category::find("FOOD");
+        $total = $category->products()->count();
+
+        self::assertEquals(2, $total);
+
+        $total = $category->products()->where('price', 200)->count();
+
+        self::assertEquals(1, $total);
+
+    }
 }

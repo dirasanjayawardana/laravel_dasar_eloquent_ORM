@@ -125,4 +125,22 @@ class ProductTest extends TestCase
             self::assertCount(1, $vouchers);
         }
     }
+
+
+    // Eloquent Collection
+    // semua hasil query dari eloquent adalah class Collection di Elloquent, yang merupakan turunan dari class Collection dari laravel Collection, sehingga semua fitur Collection bisa digunakan
+    // namun ada beberapa method tambahan
+    public function testEloquentCollection()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        // 2 products, 1, 2
+        $products = Product::query()->get();
+
+        // WHERE id IN (1, 2)
+        $products = $products->toQuery()->where('price', 200)->get();
+
+        self::assertNotNull($products);
+        self::assertEquals("2", $products[0]->id);
+    }
 }

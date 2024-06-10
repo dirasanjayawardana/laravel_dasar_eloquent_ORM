@@ -85,4 +85,12 @@ class Customer extends Model
     {
         return $this->morphOne(Image::class, "imageable");
     }
+
+
+    // Lazy Loading
+    // secara default semua relasi akan diload(ambil) datanya ketika attributenya dipanggil, baru laravel akan melakukan query
+    // Eager Loading
+    // langsung mengambil data secara langsung ketika kita mengambil data Model
+    // bisa menggunakan Query Builder dengan method with([methodRelation]) atau bisa hardcode di Modelnya dengan override $with
+    protected $with = ["wallet"];
 }
