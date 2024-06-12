@@ -19,14 +19,14 @@ class ImageSeeder extends Seeder
             $image = new Image();
             $image->url = "https://www.dirapp.com/image/1.jpg";
             $image->imageable_id = "DIRA";
-            $image->imageable_type = Customer::class; // bisa dengan memanggil alias untuk type polymorphic di app/Providers/AppServicePorvider
+            $image->imageable_type = "customer"; // memanggil alias untuk type polymorphic di app/Providers/AppServicePorvider
             $image->save();
         }
         {
             $image = new Image();
             $image->url = "https://www.dirapp.com/image/2.jpg";
             $image->imageable_id = "1";
-            $image->imageable_type = Product::class; // bisa dengan memanggil alias untuk type polymorphic di app/Providers/AppServicePorvider
+            $image->imageable_type = "product"; // memanggil alias untuk type polymorphic di app/Providers/AppServicePorvider
             $image->save();
         }
     }

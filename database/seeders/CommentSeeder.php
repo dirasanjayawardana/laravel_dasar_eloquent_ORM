@@ -27,7 +27,7 @@ class CommentSeeder extends Seeder
         $comment->email = "dira@email.com";
         $comment->title = "Title";
         $comment->commentable_id = $product->id;
-        $comment->commentable_type = Product::class; // bisa dengan memanggil alias untuk type polymorphic di app/Providers/AppServicePorvider
+        $comment->commentable_type = "product"; // memanggil alias untuk type polymorphic di app/Providers/AppServicePorvider
         $comment->save();
     }
 
@@ -39,7 +39,7 @@ class CommentSeeder extends Seeder
         $comment->email = "dira@email.com";
         $comment->title = "Title";
         $comment->commentable_id = $voucher->id;
-        $comment->commentable_type = Voucher::class; // bisa dengan memanggil alias untuk type polymorphic di app/Providers/AppServicePorvider
+        $comment->commentable_type = "voucher"; // memanggil alias untuk type polymorphic di app/Providers/AppServicePorvider
         $comment->save();
     }
 }

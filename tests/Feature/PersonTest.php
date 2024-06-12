@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Address;
 use App\Models\Person;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -29,5 +31,38 @@ class PersonTest extends TestCase
 
         self::assertEquals("SANJAYA", $person->first_name);
         self::assertEquals("Wardana", $person->last_name);
+    }
+
+
+    // Atribute casting (fitur untuk melakukan konvresi tipe data secara otomatis dari tipe data di database dengan tipe data yang ada di PHP)
+    // dengan cara mengoverride $casts=['namaKolom' => "tipeDataDiPHP"]
+    public function testAttributeCasting()
+    {
+        $person = new Person();
+        $person->first_name = "Eko";
+        $person->last_name = "Khannedy";
+        $person->save();
+
+        self::assertNotNull($person->created_at);
+        self::assertNotNull($person->updated_at);
+        self::assertInstanceOf(Carbon::class, $person->created_at);
+        self::assertInstanceOf(Carbon::class, $person->updated_at);
+    }
+    public function testCustomCasts()
+    {
+        $person = new Person();
+        $person->first_name = "Dira";
+        $person->last_name = "Sanjaya";
+        $person->address = new Address("Jalan Belum Jadi", "Jakarta", "Indonesia", "11111");
+        $person->save();
+
+        self::assertNotNull($person->created_at);
+        self::assertNotNull($person->updated_at);
+        self::assertInstanceOf(Carbon::class, $person->created_at);
+        self::assertInstanceOf(Carbon::class, $person->updated_at);
+        self::assertEquals("Jalan Belum Jadi", $person->address->street);
+        self::assertEquals("Jakarta", $person->address->city);
+        self::assertEquals("Indonesia", $person->address->country);
+        self::assertEquals("11111", $person->address->postal_code);
     }
 }

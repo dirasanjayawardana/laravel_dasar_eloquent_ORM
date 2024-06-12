@@ -31,10 +31,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // membuat alias untuk type polymorphic
-        // Relation::enforceMorphMap([
-        //     'product' => Product::class,
-        //     'voucher' => Voucher::class,
-        //     'customer' => Customer::class
-        // ]);
+        Relation::enforceMorphMap([
+            'product' => Product::class,
+            'voucher' => Voucher::class,
+            'customer' => Customer::class
+        ]);
     }
 }

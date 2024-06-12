@@ -11,6 +11,7 @@ use Database\Seeders\ImageSeeder;
 use Database\Seeders\ProductSeeder;
 use Database\Seeders\TagSeeder;
 use Database\Seeders\VoucherSeeder;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class ProductTest extends TestCase
@@ -81,7 +82,7 @@ class ProductTest extends TestCase
 
         $comments = $product->comments;
         foreach ($comments as $comment){
-            self::assertEquals(Product::class, $comment->commentable_type);
+            self::assertEquals("product", $comment->commentable_type); // menggunakan tipe yg telah di daftarkan di app/Provider/ServiceProvider
             self::assertEquals($product->id, $comment->commentable_id);
         }
     }
@@ -142,5 +143,34 @@ class ProductTest extends TestCase
 
         self::assertNotNull($products);
         self::assertEquals("2", $products[0]->id);
+    }
+
+
+    // Serialization (mengubah convert data Model menjadi JSON atau array)
+    // menggunakan method toArray(); dann toJSON();
+    public function testSerialization()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $products = Product::query()->get();
+        self::assertCount(2, $products);
+
+        $json = $products->toJson(JSON_PRETTY_PRINT);
+        Log::info($json);
+    }
+
+
+    // secara default relasi yang belum diload tidak akan di include ke dalam proses serialization
+    // jika ingin diload, maka harus load data relasinya terlebih dahulu
+    public function testSerializationRelation()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class, ImageSeeder::class]);
+
+        $products = Product::query()->get();
+        $products->load(["category", "image"]);
+        self::assertCount(2, $products);
+
+        $json = $products->toJson(JSON_PRETTY_PRINT);
+        Log::info($json);
     }
 }

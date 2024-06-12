@@ -32,6 +32,13 @@ class Category extends Model
     ];
 
 
+    // Atribute casting (fitur untuk melakukan konvresi tipe data secara otomatis dari tipe data di database dengan tipe data yang ada di PHP)
+    // dengan cara mengoverride $casts=['namaKolom' => "tipeDataDiPHP"]
+    protected $casts = [
+        'created_at' => 'datetime:U' // tipe datetime:U (dihitung detik dari unix epoch/1 Januari 1970)
+    ];
+
+
     // untuk relasi one to many bisa menggunakan method hasMany() pada model, untuk relasi bidirectional (dua arah) menggunakan method belongsTo() pada model yg lain
     public function products(): HasMany
     {

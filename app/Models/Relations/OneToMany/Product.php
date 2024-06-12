@@ -26,6 +26,12 @@ class Product extends Model
     public $timestamps = false;
 
 
+    // untuk menyembunyikan atau mengecualikan kolom mana saja yang tidak ingin dilakukan serialization (toArray() atau toJSON())
+    protected $hidden = [
+        'category_id'
+    ];
+
+
     // untuk relasi one to many bisa menggunakan method hasMany() pada model, untuk relasi bidirectional (dua arah) menggunakan method belongsTo() pada model yg lain
     // satu Category memiliki banyak relasi di Product, satu Product hanya ada satu relasi di Category
     public function category(): BelongsTo
