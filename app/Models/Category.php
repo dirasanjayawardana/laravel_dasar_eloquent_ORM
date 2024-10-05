@@ -22,6 +22,8 @@ class Category extends Model
     public $incrementing = false;
     public $timestamps = false;
 
+    // Untuk enentukan koneksi yang ingin digunakan dengan menambahkan property `protected $connection = 'nama_connection';` 
+
 
     // secara default, semua atribute di Model tidak bisa di set langsung secara masal menggunakan method create()
     // agar bisa di set langsung secara masal dengan create() maka attribute di model harus di daftarkan di $fillable
