@@ -3,6 +3,7 @@ Laravel Eloquent --> fitur ORM (Object Relational Mapping) di laravel --> membua
 
 ## Model
 Representasi dari Table di database
+- Menentukan koneksi yang ingin digunakan dengan menambahkan property `protected $connection = 'sqlite';` pada model
 
 ### Membuat Model
 `php artisan make:model NamaModel`
